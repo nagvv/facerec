@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
 #include <memory>
 #include "base.h"
 
@@ -28,6 +29,8 @@ private slots:
 	void on_detectBtn_clicked();
 
 	void on_listWidget_itemSelectionChanged();
+
+	void on_listWidget_currentRowChanged(int currentRow);
 
 private:
 	Ui::MainWindow *ui;

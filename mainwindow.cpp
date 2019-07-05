@@ -59,3 +59,11 @@ void MainWindow::on_listWidget_itemSelectionChanged()
 	else
 		ui->detectBtn->setEnabled( true );
 }
+
+void MainWindow::on_listWidget_currentRowChanged(int currentRow)
+{
+	if ( currentRow < 0 )
+		return;
+	ui->viewer->setTarget(base->getImgObj( ui->listWidget->item(currentRow)->data( Qt::ToolTipRole ).toString() ) );
+	ui->viewer->repaint();
+}

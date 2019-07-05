@@ -33,6 +33,8 @@ public:
 
 	bool addFile( QString filepath );
 
+	const ImgObj* getImgObj( QString filepath ) { return files.value(filepath, nullptr); }
+
 	bool detectImage( QString filepath );
 
 private slots:

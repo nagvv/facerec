@@ -13,6 +13,6 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_executable(qtfacerec
         main.cpp mainwindow.cpp mainwindow.h mainwindow.ui base.cpp base.h
-        nlohmann/json.hpp)
+	nlohmann/json.hpp viewer.cpp viewer.h)
 
 qt5_use_modules(qtfacerec Widgets Network Core)
