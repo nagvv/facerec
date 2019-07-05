@@ -1,5 +1,6 @@
 #include "base.h"
 #include "nlohmann/json.hpp"
+#include <iostream>
 
 Base::Base() : netManager( this )
 {
@@ -7,52 +8,21 @@ Base::Base() : netManager( this )
 	//connect(&netManager, SIGNAL(finished(QNetworkReply*)), &netManager, SLOT(deleteLater()));
 }
 
-void Base::addFile( QString filename )
+bool Base::addFile( QString filepath )
 {
-	files.push_back( filename );
+	if ( !QFileInfo::exists(filepath) )
+		return false;
+	files.insert(filepath, new ImgObj(filepath));
+	return true;
 }
 
-#include <iostream>
-
-void Base::detectImage( QString filename )
+bool Base::detectImage( QString filepath )
 {
-	/*QFile file(filename);
+	if ( !files.contains(filepath) )
+		return false;
 
-	//client.Post("api/v1/detect", params);
-
-	httplib::Request req;
-	req.path = "api/v1/detect";
-
-	req.params.emplace("demographics", "true");
-	req.params.emplace("attributes",  "true");
-	req.params.emplace("landmarks",  "true");
-
-	req.set_header("accept", "application/json");
-	req.set_header("Authorization", jwtToken);
-	req.set_header("Content-Type", "image/jpeg");
-
-	file.open(QIODevice::ReadOnly);
-	auto data = file.readAll();
-	file.close();
-
-	req.body = data.toStdString();
-
-	httplib::Response res;
-
-	req.progress = [](uint64_t len, uint64_t total) {
-		printf("%lld / %lld bytes => %d%% complete\n", len, total, (int)((len/total)*100));
-		return true; // return 'false' if you want to cancel the request.
-	};
-*/
-
-	QFile *file = new QFile( filename );
-	if ( !file->open( QFile::ReadOnly ) )
-	{
-		std::cout << "couldn't open a file" << std::endl;
-		return;
-	}
-
-	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
+	if ( !files[filepath]->fileObj.open(QFile::ReadOnly) )
+		return false;
 
 	QNetworkRequest req( url );
 	req.setRawHeader( "Authorization", jwtToken );
@@ -60,12 +30,21 @@ void Base::detectImage( QString filename )
 	req.setRawHeader( "Content-Type", "image/jpeg" );
 	// TODO: convert png and so to jpeg
 
-	netManager.post( req, file );
+	req.setOriginatingObject( files[filepath] );
+
+	netManager.post( req, &files[filepath]->fileObj );
+	// TODO: connect signal for progress bar
+	return true;
 }
 
 void Base::onFinish( QNetworkReply *rep )
 {
-	std::cout << rep->url().toString().toStdString() << " " << rep->error() << rep->readAll().toStdString()
-	          << std::endl;
+	if ( rep->error() == QNetworkReply::NoError )
+	{
+		auto *imgObj = dynamic_cast<ImgObj*>(rep->request().originatingObject());
+		imgObj->result = rep->readAll();
+		imgObj->fileObj.close();
+	}
+
 	rep->deleteLater();
 }

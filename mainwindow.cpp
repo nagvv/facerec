@@ -23,7 +23,8 @@ void MainWindow::on_addImageBtn_clicked()
 
 	for ( auto &name: fileNames )
 	{
-		base->addFile( name ); // TODO: связать этот с той через указатели?
+		if ( !base->addFile( name ) )
+			continue;
 		auto temp = QFileInfo( name );
 		QListWidgetItem *item = new QListWidgetItem( ui->listWidget, 0 );
 		item->setData( Qt::ToolTipRole, name );
@@ -41,8 +42,13 @@ void MainWindow::on_detectBtn_clicked()
 	auto selected = ui->listWidget->selectedItems();
 	for ( auto &item : selected )
 	{
-		std::cout << item->text().toStdString() << " sent" << std::endl;
-		base->detectImage( item->data( Qt::ToolTipRole ).toString() );
+		// TODO: redetect or skip already detected images
+		if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() ) )
+		{
+			item->setBackground(Qt::yellow);
+			continue;
+		}
+		item->setBackground(Qt::red);
 	}
 }
 
