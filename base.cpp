@@ -42,8 +42,33 @@ void Base::onFinish( QNetworkReply *rep )
 	if ( rep->error() == QNetworkReply::NoError )
 	{
 		auto *imgObj = dynamic_cast<ImgObj*>(rep->request().originatingObject());
-		imgObj->result = rep->readAll();
+
 		imgObj->fileObj.close();
+		QJsonDocument json = QJsonDocument::fromJson(rep->readAll());
+
+		imgObj->facialHair = json["data"]["attributes"]["facial_hair"].toString();
+		imgObj->glasses = json["data"]["attributes"]["glasses"].toString();
+		imgObj->hairColor = json["data"]["attributes"]["hair_color"].toString();
+		imgObj->hairType = json["data"]["attributes"]["hair_type"].toString();
+		imgObj->headwear = json["data"]["attributes"]["headwear"].toString();
+
+		imgObj->boxX = json["data"]["bbox"]["x"].toInt();
+		imgObj->boxY = json["data"]["bbox"]["y"].toInt();
+		imgObj->boxHeight = json["data"]["bbox"]["height"].toInt();
+		imgObj->boxWidth = json["data"]["bbox"]["width"].toInt();
+
+		imgObj->ageMean = json["data"]["demographics"]["age"]["mean"].toDouble();
+		imgObj->ageVariance = json["data"]["demographics"]["age"]["variance"].toDouble();
+		imgObj->ethnicity = json["data"]["demographics"]["ethnicity"].toString();
+		imgObj->gender = json["data"]["demographics"]["gender"].toString();
+
+		for( auto item : json["data"]["landmarks"].toArray() )
+			imgObj->landmarks.push_back( QPair( item.toObject()["x"].toInt(),
+			                                    item.toObject()["y"].toInt()) );
+
+		imgObj->score = json["data"]["score"].toDouble();
+
+		imgObj->processed = true;
 	}
 
 	rep->deleteLater();

@@ -9,7 +9,23 @@ class ImgObj : public QObject{
 public:
 	QString filepath;
 	QFile fileObj;
-	QString result;
+
+	bool processed = false;
+
+	QString facialHair;
+	QString glasses;
+	QString hairColor;
+	QString hairType;
+	QString headwear;
+
+	int boxX, boxY, boxHeight, boxWidth;
+
+	double ageMean, ageVariance;
+	QString ethnicity, gender;
+
+	QVector<QPair<int, int>> landmarks;
+
+	double score;
 
 	ImgObj(QString filepath) : filepath(filepath), fileObj(filepath) {}
 };
