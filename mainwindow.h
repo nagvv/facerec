@@ -15,14 +15,16 @@ class MainWindow : public QMainWindow
 {
 private:
 Q_OBJECT
-	std::shared_ptr<Base> base;
+	Base* base;
 
 public:
-	explicit MainWindow( std::shared_ptr<Base> base, QWidget *parent = nullptr );
+	explicit MainWindow( Base *base, QWidget *parent = nullptr );
 
 	~MainWindow();
 
 private slots:
+
+	void onImgObjUpdated( const ImgObj * );
 
 	void on_addImageBtn_clicked();
 

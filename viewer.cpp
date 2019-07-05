@@ -1,6 +1,7 @@
 #include "viewer.h"
 #include <QPainter>
 #include <QResizeEvent>
+#include <iostream>
 
 Viewer::Viewer(QWidget *parent) : QWidget(parent)
 {
@@ -33,6 +34,22 @@ void Viewer::paintEvent(QPaintEvent *event)
 		            img.height() * size );
 
 		painter.drawImage(rect, img);
+
+
+		if ( target->processed )
+		{
+			painter.setPen(Qt::green);
+			for ( auto face : target->faces )
+			{
+				painter.drawRect( QRectF( ( width() - img.width()*size )/2 + face.boxX*size,
+				                          ( height() - img.height()*size )/2 + face.boxY*size,
+				                          face.boxWidth * size,
+				                          face.boxHeight  * size ) );
+				painter.drawText( QPointF( ( width() - img.width()*size )/2 + ( face.boxX + face.boxWidth )*size + 5,
+				                           ( height() - img.height()*size )/2 + face.boxY*size + 5 ),
+				                           face.gender );
+			}
+		}
 	}
 }
 

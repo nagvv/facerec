@@ -20,11 +20,6 @@ public:
 	explicit Viewer(QWidget *parent = nullptr);
 
 	void setTarget(const ImgObj* target);
-
-
-signals:
-
-public slots:
 };
 
 #endif // VIEWER_H

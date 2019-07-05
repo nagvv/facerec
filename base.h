@@ -4,28 +4,34 @@
 #include <QtCore>
 #include <QtNetwork>
 
-class ImgObj : public QObject{
+class ImgObj : public QObject
+{
 	Q_OBJECT
 public:
+	struct Face
+	{
+		QString facialHair;
+		QString glasses;
+		QString hairColor;
+		QString hairType;
+		QString headwear;
+
+		int boxX, boxY, boxHeight, boxWidth;
+
+		double ageMean, ageVariance;
+		QString ethnicity, gender;
+
+		QVector<QPair<int, int>> landmarks;
+
+		double score;
+	};
+
 	QString filepath;
 	QFile fileObj;
 
 	bool processed = false;
 
-	QString facialHair;
-	QString glasses;
-	QString hairColor;
-	QString hairType;
-	QString headwear;
-
-	int boxX, boxY, boxHeight, boxWidth;
-
-	double ageMean, ageVariance;
-	QString ethnicity, gender;
-
-	QVector<QPair<int, int>> landmarks;
-
-	double score;
+	QVector<Face> faces;
 
 	ImgObj(QString filepath) : filepath(filepath), fileObj(filepath) {}
 };
@@ -56,6 +62,10 @@ public:
 private slots:
 
 	void onFinish( QNetworkReply *rep );
+
+signals:
+	void imgObjUpdated( const ImgObj * );
+
 };
 
 

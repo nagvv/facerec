@@ -5,7 +5,6 @@
 Base::Base() : netManager( this )
 {
 	connect( &netManager, SIGNAL( finished( QNetworkReply * ) ), this, SLOT( onFinish( QNetworkReply * ) ) );
-	//connect(&netManager, SIGNAL(finished(QNetworkReply*)), &netManager, SLOT(deleteLater()));
 }
 
 bool Base::addFile( QString filepath )
@@ -46,29 +45,40 @@ void Base::onFinish( QNetworkReply *rep )
 		imgObj->fileObj.close();
 		QJsonDocument json = QJsonDocument::fromJson(rep->readAll());
 
-		imgObj->facialHair = json["data"]["attributes"]["facial_hair"].toString();
-		imgObj->glasses = json["data"]["attributes"]["glasses"].toString();
-		imgObj->hairColor = json["data"]["attributes"]["hair_color"].toString();
-		imgObj->hairType = json["data"]["attributes"]["hair_type"].toString();
-		imgObj->headwear = json["data"]["attributes"]["headwear"].toString();
+		auto faces = json["data"].toArray();
 
-		imgObj->boxX = json["data"]["bbox"]["x"].toInt();
-		imgObj->boxY = json["data"]["bbox"]["y"].toInt();
-		imgObj->boxHeight = json["data"]["bbox"]["height"].toInt();
-		imgObj->boxWidth = json["data"]["bbox"]["width"].toInt();
+		for ( auto faceRef : faces )
+		{
+			QJsonValue face(faceRef);
+			ImgObj::Face temp;
 
-		imgObj->ageMean = json["data"]["demographics"]["age"]["mean"].toDouble();
-		imgObj->ageVariance = json["data"]["demographics"]["age"]["variance"].toDouble();
-		imgObj->ethnicity = json["data"]["demographics"]["ethnicity"].toString();
-		imgObj->gender = json["data"]["demographics"]["gender"].toString();
+			temp.facialHair = face["attributes"]["facial_hair"].toString();
+			temp.glasses = face["attributes"]["glasses"].toString();
+			temp.hairColor = face["attributes"]["hair_color"].toString();
+			temp.hairType = face["attributes"]["hair_type"].toString();
+			temp.headwear = face["attributes"]["headwear"].toString();
 
-		for( auto item : json["data"]["landmarks"].toArray() )
-			imgObj->landmarks.push_back( QPair( item.toObject()["x"].toInt(),
-			                                    item.toObject()["y"].toInt()) );
+			temp.boxX = face["bbox"]["x"].toInt();
+			temp.boxY = face["bbox"]["y"].toInt();
+			temp.boxHeight = face["bbox"]["height"].toInt();
+			temp.boxWidth = face["bbox"]["width"].toInt();
 
-		imgObj->score = json["data"]["score"].toDouble();
+			temp.ageMean = face["demographics"]["age"]["mean"].toDouble();
+			temp.ageVariance = face["demographics"]["age"]["variance"].toDouble();
+			temp.ethnicity = face["demographics"]["ethnicity"].toString();
+			temp.gender = face["demographics"]["gender"].toString();
+
+			for( auto item : face["landmarks"].toArray() )
+				temp.landmarks.push_back( QPair( item.toObject()["x"].toInt(),
+				                                    item.toObject()["y"].toInt()) );
+
+			temp.score = face["score"].toDouble();
+
+			imgObj->faces.push_back(temp);
+		}
 
 		imgObj->processed = true;
+		emit imgObjUpdated(imgObj);
 	}
 
 	rep->deleteLater();

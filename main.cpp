@@ -6,7 +6,7 @@
 int main( int argc, char *argv[] )
 {
 	QApplication a( argc, argv );
-	auto base = std::make_shared<Base>();
+	auto base = new Base();
 	MainWindow w( base );
 	w.show();
 
