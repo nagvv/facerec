@@ -10,7 +10,11 @@ private:
 	Q_OBJECT
 	const ImgObj* target = nullptr;
 
+	double viewHeight;
+	double viewX, viewY;
+
 protected:
+	void resizeEvent(QResizeEvent *event) override;
 	void paintEvent(QPaintEvent *event) override;
 public:
 	explicit Viewer(QWidget *parent = nullptr);
