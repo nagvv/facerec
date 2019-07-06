@@ -40,7 +40,7 @@ public:
 	};
 
 	QString filepath;
-	QFile fileObj;
+	QFile fileObj; // TODO: maybe store all images in the memory?
 
 	bool processed = false;
 

@@ -23,11 +23,6 @@ Viewer::Viewer( QWidget *parent ) : QWidget( parent )
 	viewY = 0.;
 }
 
-void Viewer::resizeEvent( QResizeEvent *event )
-{
-	//viewHeight = event->size().height();
-}
-
 void Viewer::paintEvent( QPaintEvent *event )
 {
 	Q_UNUSED( event )
@@ -35,32 +30,29 @@ void Viewer::paintEvent( QPaintEvent *event )
 
 	if ( target )
 	{
-		QImage img( target->filepath ); // TODO: optimise (load from memory, for example)
-
-		double sizeByX = double( height() ) / img.height();
-		double sizeByY = double( width() ) / img.width();
+		double sizeByX = double( height() ) / currentImg.height();
+		double sizeByY = double( width() ) / currentImg.width();
 		double size = std::min( sizeByX, sizeByY );
 
-		QRectF rect( ( width() - img.width() * size ) / 2,
-		             ( height() - img.height() * size ) / 2,
-		             img.width() * size,
-		             img.height() * size );
+		QRectF rect( ( width() - currentImg.width() * size ) / 2,
+		             ( height() - currentImg.height() * size ) / 2,
+		             currentImg.width() * size,
+		             currentImg.height() * size );
 
-		painter.drawImage( rect, img );
-
+		painter.drawImage( rect, currentImg );
 
 		if ( target->processed )
 		{
 			painter.setPen( Qt::green );
 			for ( auto face : target->faces )
 			{
-				painter.drawRect( QRectF( ( width() - img.width() * size ) / 2 + face.boxX * size,
-				                          ( height() - img.height() * size ) / 2 + face.boxY * size,
+				painter.drawRect( QRectF( ( width() - currentImg.width() * size ) / 2 + face.boxX * size,
+				                          ( height() - currentImg.height() * size ) / 2 + face.boxY * size,
 				                          face.boxWidth * size,
 				                          face.boxHeight * size ) );
 				painter.drawText( QPointF(
-						( width() - img.width() * size ) / 2 + ( face.boxX + face.boxWidth ) * size + 5,
-						( height() - img.height() * size ) / 2 + face.boxY * size + 5 ), face.gender );
+				        ( width() - currentImg.width() * size ) / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+				        ( height() - currentImg.height() * size ) / 2 + face.boxY * size + 5 ), face.gender );
 			}
 		}
 	}
@@ -69,4 +61,5 @@ void Viewer::paintEvent( QPaintEvent *event )
 void Viewer::setTarget( const ImgObj *target )
 {
 	this->target = target;
+	currentImg.load( target->filepath );
 }

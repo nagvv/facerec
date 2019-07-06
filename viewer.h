@@ -22,13 +22,12 @@ class Viewer : public QWidget
 private:
 Q_OBJECT
 	const ImgObj *target = nullptr;
+	QImage currentImg;
 
 	double viewHeight;
 	double viewX, viewY;
 
 protected:
-	void resizeEvent( QResizeEvent *event ) override;
-
 	void paintEvent( QPaintEvent *event ) override;
 
 public:
