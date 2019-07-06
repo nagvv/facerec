@@ -1,3 +1,16 @@
+/*
+ * Copyright 2019 nagvv ( https://github.com/nagvv )
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <QFileDialog>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -8,7 +21,8 @@ MainWindow::MainWindow( Base *base, QWidget *parent ) : QMainWindow( parent ), u
 	ui->setupUi( this );
 
 	this->base = base;
-	connect( this->base, SIGNAL( imgObjUpdated( const ImgObj * ) ), this, SLOT( onImgObjUpdated( const ImgObj * ) ) );
+	connect( this->base, SIGNAL( imgObjUpdated( const ImgObj * ) ),
+			 this, SLOT( onImgObjUpdated( const ImgObj * ) ) );
 }
 
 MainWindow::~MainWindow()
@@ -18,9 +32,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::onImgObjUpdated( const ImgObj *imgObj )
 {
-	auto items = ui->listWidget->findItems( QFileInfo(imgObj->filepath).fileName(), Qt::MatchExactly );
+	auto items = ui->listWidget->findItems( QFileInfo( imgObj->filepath ).fileName(), Qt::MatchExactly );
 	for ( auto &item : items )
-		item->setBackground(Qt::green);
+		item->setBackground( Qt::green );
 
 	ui->viewer->repaint();
 }
@@ -54,10 +68,10 @@ void MainWindow::on_detectBtn_clicked()
 		// TODO: redetect or skip already detected images
 		if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() ) )
 		{
-			item->setBackground(Qt::yellow);
+			item->setBackground( Qt::yellow );
 			continue;
 		}
-		item->setBackground(Qt::red);
+		item->setBackground( Qt::red );
 	}
 }
 
@@ -69,10 +83,10 @@ void MainWindow::on_listWidget_itemSelectionChanged()
 		ui->detectBtn->setEnabled( true );
 }
 
-void MainWindow::on_listWidget_currentRowChanged(int currentRow)
+void MainWindow::on_listWidget_currentRowChanged( int currentRow )
 {
 	if ( currentRow < 0 )
 		return;
-	ui->viewer->setTarget(base->getImgObj( ui->listWidget->item(currentRow)->data( Qt::ToolTipRole ).toString() ) );
+	ui->viewer->setTarget( base->getImgObj( ui->listWidget->item( currentRow )->data( Qt::ToolTipRole ).toString() ) );
 	ui->viewer->repaint();
 }
