@@ -41,7 +41,11 @@ private slots:
 
 	void on_addImageBtn_clicked();
 
+	void on_removeImageBtn_clicked();
+
 	void on_detectBtn_clicked();
+
+	void on_detectAllBtn_clicked();
 
 	void on_listWidget_itemSelectionChanged();
 

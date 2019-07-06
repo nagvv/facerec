@@ -60,6 +60,19 @@ void MainWindow::on_addImageBtn_clicked()
 	ui->detectAllBtn->setEnabled( true );
 }
 
+void MainWindow::on_removeImageBtn_clicked()
+{
+	auto selected = ui->listWidget->selectedItems();
+	for ( auto &item : selected )
+	{
+		base->removeFile( item->data( Qt::ToolTipRole ).toString() );
+		delete item;
+	}
+
+	if ( ui->listWidget->count() == 0 )
+		ui->detectAllBtn->setEnabled( false );
+}
+
 void MainWindow::on_detectBtn_clicked()
 {
 	auto selected = ui->listWidget->selectedItems();
@@ -75,18 +88,40 @@ void MainWindow::on_detectBtn_clicked()
 	}
 }
 
+void MainWindow::on_detectAllBtn_clicked()
+{
+	for ( int i = 0; i < ui->listWidget->count(); ++i )
+	{
+		auto item = ui->listWidget->item( i );
+		if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() ) )
+		{
+			item->setBackground( Qt::yellow );
+			continue;
+		}
+		item->setBackground( Qt::red );
+	}
+}
+
 void MainWindow::on_listWidget_itemSelectionChanged()
 {
 	if ( ui->listWidget->selectedItems().empty() )
+	{
 		ui->detectBtn->setEnabled( false );
-	else
-		ui->detectBtn->setEnabled( true );
+		ui->removeImageBtn->setEnabled( false );
+		return;
+	}
+	ui->detectBtn->setEnabled( true );
+	ui->removeImageBtn->setEnabled( true );
 }
 
 void MainWindow::on_listWidget_currentRowChanged( int currentRow )
 {
 	if ( currentRow < 0 )
+	{
+		ui->viewer->setTarget( nullptr );
+		ui->viewer->repaint();
 		return;
+	}
 	ui->viewer->setTarget( base->getImgObj( ui->listWidget->item( currentRow )->data( Qt::ToolTipRole ).toString() ) );
 	ui->viewer->repaint();
 }

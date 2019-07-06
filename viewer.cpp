@@ -61,5 +61,6 @@ void Viewer::paintEvent( QPaintEvent *event )
 void Viewer::setTarget( const ImgObj *target )
 {
 	this->target = target;
-	currentImg.load( target->filepath );
+	if ( target )
+		currentImg.load( target->filepath );
 }

@@ -27,6 +27,11 @@ bool Base::addFile( QString filepath )
 	return true;
 }
 
+void Base::removeFile( QString filepath )
+{
+	files.remove( filepath );
+}
+
 bool Base::detectImage( QString filepath )
 {
 	if ( !files.contains( filepath ) )
