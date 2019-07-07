@@ -13,6 +13,7 @@
 
 #include "base.h"
 #include <iostream>
+#include <QImageReader>
 
 Base::Base() : netManager( this )
 {
@@ -48,18 +49,36 @@ bool Base::detectImage( QString filepath )
 
 	req.setOriginatingObject( files[filepath] );
 
-	netManager.post( req, &files[filepath]->fileObj );
+	files[filepath]->buffer = new QBuffer();
+	files[filepath]->buffer->open( QIODevice::ReadWrite );
+
+	if ( QImageReader::imageFormat( &files[filepath]->fileObj ) == "jpeg" )
+	{
+		files[filepath]->buffer->write( files[filepath]->fileObj.readAll() );
+	}
+	else
+	{
+		QImage timg( filepath );
+		timg.save( files[filepath]->buffer, "JPG" );
+	}
+
+	files[filepath]->buffer->reset();
+	files[filepath]->fileObj.close();
+
+	netManager.post( req, files[filepath]->buffer );
 	// TODO: connect signal for progress bar
 	return true;
 }
 
 void Base::onFinish( QNetworkReply *rep )
 {
+	auto *imgObj = dynamic_cast<ImgObj *>(rep->request().originatingObject());
+
+	delete imgObj->buffer;
+	imgObj->buffer = nullptr;
+
 	if ( rep->error() == QNetworkReply::NoError )
 	{
-		auto *imgObj = dynamic_cast<ImgObj *>(rep->request().originatingObject());
-
-		imgObj->fileObj.close();
 		QJsonDocument json = QJsonDocument::fromJson( rep->readAll() );
 
 		auto faces = json["data"].toArray();
@@ -92,10 +111,9 @@ void Base::onFinish( QNetworkReply *rep )
 
 			imgObj->faces.push_back( temp );
 		}
-
-		imgObj->processed = true;
-		emit imgObjUpdated( imgObj );
 	}
+
+	emit imgObjUpdated( imgObj );
 
 	rep->deleteLater();
 }

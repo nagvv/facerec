@@ -16,6 +16,7 @@
 
 #include <QtCore>
 #include <QtNetwork>
+#include <QImage>
 
 class ImgObj : public QObject
 {
@@ -41,8 +42,7 @@ public:
 
 	QString filepath;
 	QFile fileObj; // TODO: maybe store all images in the memory?
-
-	bool processed = false;
+	QBuffer *buffer;
 
 	QVector<Face> faces;
 

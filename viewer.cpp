@@ -41,19 +41,16 @@ void Viewer::paintEvent( QPaintEvent *event )
 
 		painter.drawImage( rect, currentImg );
 
-		if ( target->processed )
+		painter.setPen( Qt::green );
+		for ( auto face : target->faces )
 		{
-			painter.setPen( Qt::green );
-			for ( auto face : target->faces )
-			{
-				painter.drawRect( QRectF( ( width() - currentImg.width() * size ) / 2 + face.boxX * size,
-				                          ( height() - currentImg.height() * size ) / 2 + face.boxY * size,
-				                          face.boxWidth * size,
-				                          face.boxHeight * size ) );
-				painter.drawText( QPointF(
-				        ( width() - currentImg.width() * size ) / 2 + ( face.boxX + face.boxWidth ) * size + 5,
-				        ( height() - currentImg.height() * size ) / 2 + face.boxY * size + 5 ), face.gender );
-			}
+			painter.drawRect( QRectF( ( width() - currentImg.width() * size ) / 2 + face.boxX * size,
+			                          ( height() - currentImg.height() * size ) / 2 + face.boxY * size,
+			                          face.boxWidth * size,
+			                          face.boxHeight * size ) );
+			painter.drawText( QPointF(
+			        ( width() - currentImg.width() * size ) / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+			        ( height() - currentImg.height() * size ) / 2 + face.boxY * size + 5 ), face.gender );
 		}
 	}
 }

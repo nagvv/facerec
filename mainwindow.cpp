@@ -34,25 +34,25 @@ void MainWindow::onImgObjUpdated( const ImgObj *imgObj )
 {
 	auto items = ui->listWidget->findItems( QFileInfo( imgObj->filepath ).fileName(), Qt::MatchExactly );
 	for ( auto &item : items )
-		item->setBackground( Qt::green );
+		item->setBackground( Qt::green ); // TODO: red if error occured
 
 	ui->viewer->repaint();
 }
 
 void MainWindow::on_addImageBtn_clicked()
 {
-	QStringList fileNames = QFileDialog::getOpenFileNames( this,
+	QStringList filePaths = QFileDialog::getOpenFileNames( this,
 	                                                       "Choose images",
 	                                                       QString(),
-	                                                       "JPEG Images (*.jpeg *.jpg)" );
+	                                                       "Images (*.jpeg *.jpg *.png *.bmp)" );
 
-	for ( auto &name: fileNames )
+	for ( auto &fpath: filePaths )
 	{
-		if ( !base->addFile( name ) )
+		if ( !base->addFile( fpath ) )
 			continue;
-		auto temp = QFileInfo( name );
-		QListWidgetItem *item = new QListWidgetItem( ui->listWidget, 0 );
-		item->setData( Qt::ToolTipRole, name );
+		auto temp = QFileInfo( fpath );
+		auto item = new QListWidgetItem( ui->listWidget, 0 );
+		item->setData( Qt::ToolTipRole, fpath );
 		item->setText( temp.fileName() );
 		ui->listWidget->addItem( item );
 	}
