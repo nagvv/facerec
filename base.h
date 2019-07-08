@@ -16,6 +16,7 @@
 
 #include <QtCore>
 #include <QtNetwork>
+#include <functional>
 
 class ImgObj : public QObject
 {
@@ -58,8 +59,7 @@ Q_OBJECT
 	inline static constexpr char jwtToken[] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NTk2Mjc4Zi05MjczLTQ0NTgtODUxNi1iNzFjNTM5NTljOTIiLCJzdWIiOjM4LCJpYXQiOjE1NjIyMzMyNDUsIm5iZiI6MTU2MjIzMzI0NSwidHlwZSI6ImFjY2VzcyIsImZyZXNoIjpmYWxzZX0.TQVBvihhA2zzXDzV5VQD2Sz4Q_nR0IboyDc62S1nIPc";
 
 	QNetworkAccessManager netManager;
-	QUrl url = QUrl(
-			"https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
+	QUrl url = QUrl( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
 
 public:
 	Base();
@@ -72,7 +72,8 @@ public:
 
 	const ImgObj *getImgObj( QString filepath ) { return files.value( filepath, nullptr ); }
 
-	bool detectImage( QString filepath );
+	bool detectImage( QString filepath, std::function<void( qint64, qint64 )> uploadProgress = nullptr,
+	                  std::function<void( qint64, qint64 )> downloadProgress = nullptr);
 
 private slots:
 

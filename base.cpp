@@ -12,7 +12,6 @@
  */
 
 #include "base.h"
-#include <iostream>
 #include <QImageReader>
 
 Base::Base() : netManager( this )
@@ -33,7 +32,8 @@ void Base::removeFile( QString filepath )
 	files.remove( filepath );
 }
 
-bool Base::detectImage( QString filepath )
+bool Base::detectImage( QString filepath, std::function<void( qint64, qint64 )> uploadProgress,
+                        std::function<void( qint64, qint64 )> downloadProgress )
 {
 	if ( !files.contains( filepath ) )
 		return false;
@@ -64,8 +64,13 @@ bool Base::detectImage( QString filepath )
 	files[filepath]->buffer->reset();
 	files[filepath]->fileObj.close();
 
-	netManager.post( req, files[filepath]->buffer );
-	// TODO: connect signal for progress bar
+	auto rep = netManager.post( req, files[filepath]->buffer );
+
+	if ( uploadProgress )
+		connect( rep, &QNetworkReply::uploadProgress, uploadProgress );
+	if ( downloadProgress )
+		connect( rep, &QNetworkReply::downloadProgress, downloadProgress );
+
 	return true;
 }
 
