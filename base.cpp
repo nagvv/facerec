@@ -115,6 +115,7 @@ void Base::onFinish( QNetworkReply *rep )
 
 			imgObj->faces.push_back( temp );
 		}
+		imgObj->success = true;
 	}
 
 	emit imgObjUpdated( imgObj );

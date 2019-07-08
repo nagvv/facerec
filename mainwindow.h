@@ -16,6 +16,7 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QProgressBar>
 #include <memory>
 #include "base.h"
 
@@ -29,6 +30,11 @@ class MainWindow : public QMainWindow
 private:
 Q_OBJECT
 	Base *base;
+	int nowProcessing = 0;
+	int finishedProcessing = 0;
+	void detectItem( QListWidgetItem *item );
+	void pushProcessing();
+	void popProcessing();
 
 public:
 	explicit MainWindow( Base *base, QWidget *parent = nullptr );
@@ -36,7 +42,6 @@ public:
 	~MainWindow();
 
 private slots:
-
 	void onImgObjUpdated( const ImgObj * );
 
 	void on_addImageBtn_clicked();

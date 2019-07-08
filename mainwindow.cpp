@@ -30,13 +30,58 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+void MainWindow::detectItem( QListWidgetItem *item )
+{
+	if ( item->background() == Qt::green ) // img has succesfully detected
+		return;
+
+	if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() /*,
+							[this](qint64 bytesSent, qint64 bytesTotal)
+							{
+
+							}*/) )
+	{
+		pushProcessing();
+		item->setBackground( Qt::yellow );
+		return;
+	}
+
+	item->setBackground( Qt::red );
+}
+
 void MainWindow::onImgObjUpdated( const ImgObj *imgObj )
 {
 	auto items = ui->listWidget->findItems( QFileInfo( imgObj->filepath ).fileName(), Qt::MatchExactly );
+
 	for ( auto &item : items )
-		item->setBackground( Qt::green ); // TODO: red if error occured
+		item->setBackground( imgObj->success ? Qt::green : Qt::red );
+
+	popProcessing();
 
 	ui->viewer->repaint();
+}
+
+void MainWindow::pushProcessing()
+{
+	nowProcessing++;
+	if ( nowProcessing + finishedProcessing == 1 )
+		ui->progressBar->setMaximum( 0 ); // The progress bar "rewinds" and shows no progress
+	else // ( nowProcessing + finishedProcessing > 1)
+		ui->progressBar->setMaximum( nowProcessing + finishedProcessing );
+}
+
+void MainWindow::popProcessing()
+{
+	nowProcessing--;
+	finishedProcessing++;
+	ui->progressBar->setValue( finishedProcessing );
+
+	if ( nowProcessing == 0 ) // all job finished
+	{
+		finishedProcessing = 0;
+		ui->progressBar->setValue( 0 );
+		ui->progressBar->setMaximum( 1 );
+	}
 }
 
 void MainWindow::on_addImageBtn_clicked()
@@ -78,30 +123,14 @@ void MainWindow::on_removeImageBtn_clicked()
 void MainWindow::on_detectBtn_clicked()
 {
 	auto selected = ui->listWidget->selectedItems();
-	for ( auto &item : selected )
-	{
-		// TODO: redetect or skip already detected images
-		if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() ) )
-		{
-			item->setBackground( Qt::yellow );
-			continue;
-		}
-		item->setBackground( Qt::red );
-	}
+	for ( auto item : selected )
+		detectItem( item );
 }
 
 void MainWindow::on_detectAllBtn_clicked()
 {
 	for ( int i = 0; i < ui->listWidget->count(); ++i )
-	{
-		auto item = ui->listWidget->item( i );
-		if ( base->detectImage( item->data( Qt::ToolTipRole ).toString() ) )
-		{
-			item->setBackground( Qt::yellow );
-			continue;
-		}
-		item->setBackground( Qt::red );
-	}
+		detectItem( ui->listWidget->item( i ) );
 }
 
 void MainWindow::on_listWidget_itemSelectionChanged()

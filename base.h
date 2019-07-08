@@ -45,6 +45,7 @@ public:
 	QBuffer *buffer;
 
 	QVector<Face> faces;
+	bool success = false;
 
 	ImgObj( QString filepath ) : filepath( filepath ), fileObj( filepath ) {}
 };
