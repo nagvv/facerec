@@ -41,7 +41,7 @@ public:
 	};
 
 	QString filepath;
-	QFile fileObj; // TODO: maybe store all images in the memory?
+	QFile fileObj;
 	QBuffer *buffer;
 
 	QVector<Face> faces;

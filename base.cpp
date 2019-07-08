@@ -45,7 +45,6 @@ bool Base::detectImage( QString filepath )
 	req.setRawHeader( "Authorization", jwtToken );
 	req.setRawHeader( "accept", "application/json" );
 	req.setRawHeader( "Content-Type", "image/jpeg" );
-	// TODO: convert png and so to jpeg
 
 	req.setOriginatingObject( files[filepath] );
 

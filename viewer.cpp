@@ -16,43 +16,94 @@
 #include <QResizeEvent>
 #include <iostream>
 
-Viewer::Viewer( QWidget *parent ) : QWidget( parent )
-{
-	viewHeight = this->height();
-	viewX = 0.;
-	viewY = 0.;
-}
+Viewer::Viewer( QWidget *parent ) : QWidget( parent ) {}
 
 void Viewer::paintEvent( QPaintEvent *event )
 {
 	Q_UNUSED( event )
 	QPainter painter( this );
+	painter.translate( width() / 2 + viewX * viewZoom, height() / 2 + viewY * viewZoom);
+	//painter.scale( viewZoom, viewZoom );
 
 	if ( target )
 	{
 		double sizeByX = double( height() ) / currentImg.height();
 		double sizeByY = double( width() ) / currentImg.width();
-		double size = std::min( sizeByX, sizeByY );
+		double size = std::min( sizeByX, sizeByY ) * viewZoom;
 
-		QRectF rect( ( width() - currentImg.width() * size ) / 2,
-		             ( height() - currentImg.height() * size ) / 2,
-		             currentImg.width() * size,
-		             currentImg.height() * size );
+		QRectF rect( -currentImg.width() * size / 2, -currentImg.height() * size / 2,
+		             currentImg.width() * size, currentImg.height() * size );
 
 		painter.drawImage( rect, currentImg );
 
 		painter.setPen( Qt::green );
+		QFont font;
+		font.setPointSize( 12 );
+		painter.setFont( font );
+
 		for ( auto face : target->faces )
 		{
-			painter.drawRect( QRectF( ( width() - currentImg.width() * size ) / 2 + face.boxX * size,
-			                          ( height() - currentImg.height() * size ) / 2 + face.boxY * size,
+			painter.drawRect( QRectF( -currentImg.width() * size / 2 + face.boxX * size,
+			                          -currentImg.height() * size / 2 + face.boxY * size,
 			                          face.boxWidth * size,
 			                          face.boxHeight * size ) );
 			painter.drawText( QPointF(
-			        ( width() - currentImg.width() * size ) / 2 + ( face.boxX + face.boxWidth ) * size + 5,
-			        ( height() - currentImg.height() * size ) / 2 + face.boxY * size + 5 ), face.gender );
+			        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+			        -currentImg.height() * size / 2 + face.boxY * size + 12 ),
+			                  face.gender );
+
+			painter.drawText( QPointF(
+			        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+			        -currentImg.height() * size / 2 + face.boxY * size + 26 ),
+			                  QString::number( face.ageMean, 'f', 1 ) );
+
+			// TODO: make text readable at any background
 		}
 	}
+}
+
+void Viewer::wheelEvent(QWheelEvent * event)
+{
+	double zoom = double(event->angleDelta().y()) / 1000;
+	if ( abs( zoom ) > 0.8 )
+		zoom = std::copysign( 0.8, zoom );
+
+	viewZoom *= 1 + zoom;
+	repaint();
+	// TODO: add zooming limitations
+	// TODO: make zoomimg to mouse position
+}
+
+void Viewer::mouseMoveEvent(QMouseEvent *event)
+{
+	if ( !moving )
+		return;
+
+	int relX = event->x() - mouseOldX;
+	int relY = event->y() - mouseOldY;
+
+	mouseOldX = event->x();
+	mouseOldY = event->y();
+
+	viewX += relX / viewZoom;
+	viewY += relY / viewZoom;
+	repaint();
+}
+
+void Viewer::mousePressEvent(QMouseEvent *event)
+{
+	if ( event->button() == Qt::LeftButton )
+	{
+		moving = true;
+		mouseOldX = event->x();
+		mouseOldY = event->y();
+	}
+}
+
+void Viewer::mouseReleaseEvent(QMouseEvent *event)
+{
+	if ( event->button() == Qt::LeftButton )
+		moving = false;
 }
 
 void Viewer::setTarget( const ImgObj *target )
@@ -60,4 +111,7 @@ void Viewer::setTarget( const ImgObj *target )
 	this->target = target;
 	if ( target )
 		currentImg.load( target->filepath );
+	viewX = 0.;
+	viewY = 0.;
+	viewZoom = 1.;
 }

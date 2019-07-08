@@ -24,11 +24,19 @@ Q_OBJECT
 	const ImgObj *target = nullptr;
 	QImage currentImg;
 
-	double viewHeight;
-	double viewX, viewY;
+	double viewX = 0., viewY = 0.;
+	double viewZoom = 1.;
+
+	int mouseOldX, mouseOldY;
+	bool moving = false;
 
 protected:
 	void paintEvent( QPaintEvent *event ) override;
+	void wheelEvent(QWheelEvent *event) override;
+
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
 
 public:
 	explicit Viewer( QWidget *parent = nullptr );
