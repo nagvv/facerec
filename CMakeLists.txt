@@ -16,7 +16,7 @@ add_library( libfacerec SHARED base.cpp base.h )
 qt5_use_modules( libfacerec Network Core Gui )
 
 add_executable( facerec
-        main.cpp mainwindow.cpp mainwindow.h mainwindow.ui viewer.cpp viewer.h base.h )
+        main.cpp mainwindow.cpp mainwindow.h mainwindow.ui viewer.cpp viewer.h )
 
 target_link_libraries(facerec libfacerec)
 

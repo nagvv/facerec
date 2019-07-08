@@ -27,7 +27,7 @@ Q_OBJECT
 	double viewX = 0., viewY = 0.;
 	double viewZoom = 1.;
 
-	int mouseOldX, mouseOldY;
+	int mouseOldX = 0, mouseOldY = 0;
 	bool moving = false;
 
 protected:

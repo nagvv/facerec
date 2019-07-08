@@ -58,6 +58,8 @@ void MainWindow::on_addImageBtn_clicked()
 	}
 
 	ui->detectAllBtn->setEnabled( true );
+	if ( ui->listWidget->currentRow() < 0 )
+		ui->listWidget->setCurrentRow( 0 );
 }
 
 void MainWindow::on_removeImageBtn_clicked()
