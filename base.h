@@ -16,7 +16,6 @@
 
 #include <QtCore>
 #include <QtNetwork>
-#include <QImage>
 
 class ImgObj : public QObject
 {
