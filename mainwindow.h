@@ -46,6 +46,8 @@ private slots:
 
 	void on_addImageBtn_clicked();
 
+	void on_addDirBtn_clicked();
+
 	void on_removeImageBtn_clicked();
 
 	void on_detectBtn_clicked();

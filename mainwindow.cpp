@@ -106,6 +106,32 @@ void MainWindow::on_addImageBtn_clicked()
 		ui->listWidget->setCurrentRow( 0 );
 }
 
+void MainWindow::on_addDirBtn_clicked()
+{
+	QString dirPath = QFileDialog::getExistingDirectory( this );
+
+	if ( dirPath.isEmpty() )
+		return;
+
+	QStringList fileNames = QDir( dirPath ).entryList( { "*.jpg", "*jpeg", "*.png", "*.bmp" }, QDir::Files );
+
+	for ( auto &fname: fileNames )
+	{
+		QString fpath = dirPath + QDir::separator() + fname;
+		if ( !base->addFile( fpath ) )
+			continue;
+		auto item = new QListWidgetItem( ui->listWidget, 0 );
+		item->setData( Qt::ToolTipRole, fpath );
+		item->setText( fname );
+		ui->listWidget->addItem( item );
+	}
+
+	ui->detectAllBtn->setEnabled( true );
+	if ( ui->listWidget->currentRow() < 0 )
+		ui->listWidget->setCurrentRow( 0 );
+}
+
+
 void MainWindow::on_removeImageBtn_clicked()
 {
 	auto selected = ui->listWidget->selectedItems();
@@ -134,7 +160,8 @@ void MainWindow::on_detectAllBtn_clicked()
 
 void MainWindow::on_listWidget_itemSelectionChanged()
 {
-	if ( ui->listWidget->selectedItems().empty() )
+	ui->listWidget->setItemSelected( ui->listWidget->currentItem(), true );
+	if ( ui->listWidget->selectedItems().isEmpty() )
 	{
 		ui->detectBtn->setEnabled( false );
 		ui->removeImageBtn->setEnabled( false );
