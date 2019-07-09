@@ -46,6 +46,8 @@ void LoginDialog::onGetTokenFinished( const QString &token )
 		auto palette = ui->statusLabel->palette();
 		palette.setColor( QPalette::WindowText, Qt::green );
 		ui->statusLabel->setPalette( palette );
+
+		done( 0 );
 		return;
 	}
 	ui->singupBtn->setEnabled( true );

@@ -74,17 +74,25 @@ void Viewer::paintEvent( QPaintEvent *event )
 	}
 }
 
-void Viewer::wheelEvent(QWheelEvent * event)
+void Viewer::wheelEvent(QWheelEvent *event)
 {
+	double prevDeltaX = ( width() / 2 - event->x() ) / viewZoom;
+	double prevDeltaY = ( height() / 2 - event->y() ) / viewZoom;
+
 	double zoom = double(event->angleDelta().y()) / 1000;
 	if ( abs( zoom ) > 0.8 )
 		zoom = std::copysign( 0.8, zoom );
 
 	viewZoom *= 1 + zoom;
-
 	fixZoom();
+
+	double nextDeltaX = ( width() / 2 - event->x() ) / viewZoom;
+	double nextDeltaY = ( height() / 2 - event->y() ) / viewZoom;
+
+	viewX -= ( nextDeltaX - prevDeltaX );
+	viewY -= ( nextDeltaY - prevDeltaY );
+
 	repaint();
-	// TODO: make zoomimg to mouse position
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *event)

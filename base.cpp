@@ -41,7 +41,7 @@ bool Base::detectImage( QString filepath, std::function<void( qint64, qint64 )> 
 	if ( !files[filepath]->fileObj.open( QFile::ReadOnly ) )
 		return false;
 
-	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
+	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true" );
 	QNetworkRequest req( url );
 	req.setRawHeader( "Authorization", QString( "Bearer %1" ).arg( jwtToken ).toUtf8() );
 	req.setRawHeader( "accept", "application/json" );
