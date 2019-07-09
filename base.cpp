@@ -169,7 +169,7 @@ void Base::onFinish( QNetworkReply *rep )
 			temp.gender = face["demographics"]["gender"].toString();
 
 			for ( auto item : face["landmarks"].toArray() )
-				temp.landmarks.push_back( QPair( item.toObject()["x"].toInt(), item.toObject()["y"].toInt() ) );
+				temp.landmarks.push_back( QPair<int, int>( item.toObject()["x"].toInt(), item.toObject()["y"].toInt() ) );
 
 			temp.score = face["score"].toDouble();
 
