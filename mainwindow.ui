@@ -78,13 +78,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="loginBtn">
-        <property name="text">
-         <string>Sign up / Log in</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="detectBtn">
@@ -124,6 +117,27 @@
           </property>
           <property name="text">
            <string>Remove image</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QPushButton" name="loginBtn">
+          <property name="text">
+           <string>Sign up / Log in</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="logoutBtn">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Log out</string>
           </property>
          </widget>
         </item>

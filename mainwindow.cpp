@@ -160,4 +160,16 @@ void MainWindow::on_loginBtn_clicked()
 {
 	LoginDialog login( base, this );
 	login.exec();
+	if ( base->isAuthorized() )
+	{
+		ui->loginBtn->setEnabled( false );
+		ui->logoutBtn->setEnabled( true );
+	}
+}
+
+void MainWindow::on_logoutBtn_clicked()
+{
+	base->setToken( QString() );
+	ui->loginBtn->setEnabled( true );
+	ui->logoutBtn->setEnabled( false );
 }

@@ -62,7 +62,7 @@ private:
 Q_OBJECT
 
 	QHash<QString, ImgObj *> files;
-	//TODO: вынести Bearer из токена
+
 	QString jwtToken;
 
 	QNetworkAccessManager netManager;
