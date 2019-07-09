@@ -30,6 +30,8 @@ Q_OBJECT
 	int mouseOldX = 0., mouseOldY = 0.;
 	bool moving = false;
 
+	void fixZoom();
+
 protected:
 	void paintEvent( QPaintEvent *event ) override;
 	void wheelEvent(QWheelEvent *event) override;

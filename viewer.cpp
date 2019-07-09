@@ -18,12 +18,24 @@
 
 Viewer::Viewer( QWidget *parent ) : QWidget( parent ) {}
 
+void Viewer::fixZoom()
+{
+	double sizeByX = double( height() ) / currentImg.height();
+	double sizeByY = double( width() ) / currentImg.width();
+	double size = std::min( sizeByX, sizeByY );
+
+	if ( viewZoom * size > 5 )
+		viewZoom = 5 / size;
+
+	if ( viewZoom < 0.4 && viewZoom < 0.8 / size )
+		viewZoom = std::min( 0.4, 0.8 / size );
+}
+
 void Viewer::paintEvent( QPaintEvent *event )
 {
 	Q_UNUSED( event )
 	QPainter painter( this );
 	painter.translate( width() / 2 + viewX * viewZoom, height() / 2 + viewY * viewZoom);
-	//painter.scale( viewZoom, viewZoom );
 
 	if ( target )
 	{
@@ -69,8 +81,9 @@ void Viewer::wheelEvent(QWheelEvent * event)
 		zoom = std::copysign( 0.8, zoom );
 
 	viewZoom *= 1 + zoom;
+
+	fixZoom();
 	repaint();
-	// TODO: add zooming limitations
 	// TODO: make zoomimg to mouse position
 }
 
@@ -114,4 +127,5 @@ void Viewer::setTarget( const ImgObj *target )
 	viewX = 0.;
 	viewY = 0.;
 	viewZoom = 1.;
+	fixZoom();
 }
