@@ -82,9 +82,13 @@ void MainWindow::popProcessing()
 		ui->progressBar->setMaximum( 1 );
 	}
 }
-#include <QTreeView>
+
 void MainWindow::on_addImageBtn_clicked()
 {
+	auto keyboardModifiers = QGuiApplication::keyboardModifiers();
+	if ( keyboardModifiers & Qt::ControlModifier )
+		return addImagesFromDirectory();
+
 	QStringList filePaths = QFileDialog::getOpenFileNames( this,
 	                                                       "Select one or more images",
 	                                                       QString(),
@@ -106,7 +110,7 @@ void MainWindow::on_addImageBtn_clicked()
 		ui->listWidget->setCurrentRow( 0 );
 }
 
-void MainWindow::on_addDirBtn_clicked()
+void MainWindow::addImagesFromDirectory()
 {
 	QString dirPath = QFileDialog::getExistingDirectory( this );
 

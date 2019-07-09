@@ -117,27 +117,11 @@
             <height>0</height>
            </size>
           </property>
-          <property name="text">
-           <string>Add image</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="addDirBtn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>30</width>
-            <height>16777215</height>
-           </size>
+          <property name="toolTip">
+           <string>Hold CTRL to select a directory</string>
           </property>
           <property name="text">
-           <string>dir</string>
+           <string>Add images</string>
           </property>
          </widget>
         </item>

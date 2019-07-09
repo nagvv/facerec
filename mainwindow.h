@@ -16,8 +16,6 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
-#include <QProgressBar>
-#include <memory>
 #include "base.h"
 
 namespace Ui
@@ -36,6 +34,8 @@ Q_OBJECT
 	void pushProcessing();
 	void popProcessing();
 
+	void addImagesFromDirectory();
+
 public:
 	explicit MainWindow( Base *base, QWidget *parent = nullptr );
 
@@ -45,8 +45,6 @@ private slots:
 	void onImgObjUpdated( const ImgObj * );
 
 	void on_addImageBtn_clicked();
-
-	void on_addDirBtn_clicked();
 
 	void on_removeImageBtn_clicked();
 
