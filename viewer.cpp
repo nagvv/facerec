@@ -33,44 +33,44 @@ void Viewer::fixZoom()
 
 void Viewer::paintEvent( QPaintEvent *event )
 {
+	if ( !target )
+		return;
+
 	Q_UNUSED( event )
 	QPainter painter( this );
 	painter.translate( width() / 2 + viewX * viewZoom, height() / 2 + viewY * viewZoom);
 
-	if ( target )
+	double sizeByX = double( height() ) / currentImg.height();
+	double sizeByY = double( width() ) / currentImg.width();
+	double size = std::min( sizeByX, sizeByY ) * viewZoom;
+
+	QRectF rect( -currentImg.width() * size / 2, -currentImg.height() * size / 2,
+	             currentImg.width() * size, currentImg.height() * size );
+
+	painter.drawImage( rect, currentImg );
+
+	painter.setPen( Qt::green );
+	QFont font;
+	font.setPointSize( 12 );
+	painter.setFont( font );
+
+	for ( auto face : target->faces )
 	{
-		double sizeByX = double( height() ) / currentImg.height();
-		double sizeByY = double( width() ) / currentImg.width();
-		double size = std::min( sizeByX, sizeByY ) * viewZoom;
+		painter.drawRect( QRectF( -currentImg.width() * size / 2 + face.boxX * size,
+		                          -currentImg.height() * size / 2 + face.boxY * size,
+		                          face.boxWidth * size,
+		                          face.boxHeight * size ) );
+		painter.drawText( QPointF(
+		        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+		        -currentImg.height() * size / 2 + face.boxY * size + 12 ),
+		                  face.gender );
 
-		QRectF rect( -currentImg.width() * size / 2, -currentImg.height() * size / 2,
-		             currentImg.width() * size, currentImg.height() * size );
+		painter.drawText( QPointF(
+		        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
+		        -currentImg.height() * size / 2 + face.boxY * size + 26 ),
+		                  QString::number( face.ageMean, 'f', 1 ) );
 
-		painter.drawImage( rect, currentImg );
-
-		painter.setPen( Qt::green );
-		QFont font;
-		font.setPointSize( 12 );
-		painter.setFont( font );
-
-		for ( auto face : target->faces )
-		{
-			painter.drawRect( QRectF( -currentImg.width() * size / 2 + face.boxX * size,
-			                          -currentImg.height() * size / 2 + face.boxY * size,
-			                          face.boxWidth * size,
-			                          face.boxHeight * size ) );
-			painter.drawText( QPointF(
-			        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
-			        -currentImg.height() * size / 2 + face.boxY * size + 12 ),
-			                  face.gender );
-
-			painter.drawText( QPointF(
-			        -currentImg.width() * size / 2 + ( face.boxX + face.boxWidth ) * size + 5,
-			        -currentImg.height() * size / 2 + face.boxY * size + 26 ),
-			                  QString::number( face.ageMean, 'f', 1 ) );
-
-			// TODO: make text readable at any background
-		}
+		// TODO: make text readable at any background
 	}
 }
 

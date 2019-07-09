@@ -180,10 +180,12 @@ void MainWindow::on_listWidget_currentRowChanged( int currentRow )
 	if ( currentRow < 0 )
 	{
 		ui->viewer->setTarget( nullptr );
+		ui->helpText->setVisible( true );
 		ui->viewer->repaint();
 		return;
 	}
 	ui->viewer->setTarget( base->getImgObj( ui->listWidget->item( currentRow )->data( Qt::ToolTipRole ).toString() ) );
+	ui->helpText->setVisible( false );
 	ui->viewer->repaint();
 }
 
