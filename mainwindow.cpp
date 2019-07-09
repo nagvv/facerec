@@ -14,15 +14,14 @@
 #include <QFileDialog>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <iostream>
+#include "logindialog.h"
 
 MainWindow::MainWindow( Base *base, QWidget *parent ) : QMainWindow( parent ), ui( new Ui::MainWindow )
 {
 	ui->setupUi( this );
 
 	this->base = base;
-	connect( this->base, SIGNAL( imgObjUpdated( const ImgObj * ) ),
-			 this, SLOT( onImgObjUpdated( const ImgObj * ) ) );
+	connect( this->base, &Base::imgObjUpdated, this, &MainWindow::onImgObjUpdated );
 }
 
 MainWindow::~MainWindow()
@@ -83,11 +82,11 @@ void MainWindow::popProcessing()
 		ui->progressBar->setMaximum( 1 );
 	}
 }
-
+#include <QTreeView>
 void MainWindow::on_addImageBtn_clicked()
 {
 	QStringList filePaths = QFileDialog::getOpenFileNames( this,
-	                                                       "Choose images",
+	                                                       "Select one or more images",
 	                                                       QString(),
 	                                                       "Images (*.jpeg *.jpg *.png *.bmp)" );
 
@@ -155,4 +154,10 @@ void MainWindow::on_listWidget_currentRowChanged( int currentRow )
 	}
 	ui->viewer->setTarget( base->getImgObj( ui->listWidget->item( currentRow )->data( Qt::ToolTipRole ).toString() ) );
 	ui->viewer->repaint();
+}
+
+void MainWindow::on_loginBtn_clicked()
+{
+	LoginDialog login( base, this );
+	login.exec();
 }

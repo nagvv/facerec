@@ -14,11 +14,17 @@
 #ifndef BASE_H
 #define BASE_H
 
+#if defined(SHARED_LIBRARY)
+#  define SHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define SHARED_EXPORT Q_DECL_IMPORT
+#endif
+
 #include <QtCore>
 #include <QtNetwork>
 #include <functional>
 
-class ImgObj : public QObject
+class SHARED_EXPORT ImgObj : public QObject
 {
 Q_OBJECT
 public:
@@ -50,17 +56,16 @@ public:
 	ImgObj( QString filepath ) : filepath( filepath ), fileObj( filepath ) {}
 };
 
-class Base : public QObject
+class SHARED_EXPORT Base : public QObject
 {
 private:
 Q_OBJECT
 
 	QHash<QString, ImgObj *> files;
 	//TODO: вынести Bearer из токена
-	inline static constexpr char jwtToken[] = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NTk2Mjc4Zi05MjczLTQ0NTgtODUxNi1iNzFjNTM5NTljOTIiLCJzdWIiOjM4LCJpYXQiOjE1NjIyMzMyNDUsIm5iZiI6MTU2MjIzMzI0NSwidHlwZSI6ImFjY2VzcyIsImZyZXNoIjpmYWxzZX0.TQVBvihhA2zzXDzV5VQD2Sz4Q_nR0IboyDc62S1nIPc";
+	QString jwtToken;
 
 	QNetworkAccessManager netManager;
-	QUrl url = QUrl( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
 
 public:
 	Base();
@@ -76,14 +81,30 @@ public:
 	bool detectImage( QString filepath, std::function<void( qint64, qint64 )> uploadProgress = nullptr,
 	                  std::function<void( qint64, qint64 )> downloadProgress = nullptr);
 
+	void createDemoUser( const QString &email, const QString &password );
+
+	void getToken( const QString &email, const QString &password );
+
+	void setToken( const QString &token );
+
+	bool isAuthorized();
+
+
 private slots:
 
 	void onFinish( QNetworkReply *rep );
+
+	void onGetTokenFinish( QNetworkReply *rep );
+
+	void onCreateUserFinish( QNetworkReply *rep );
 
 signals:
 
 	void imgObjUpdated( const ImgObj * );
 
+	void getTokenFinished( const QString &token );
+
+	void createUserFinished( bool success );
 };
 
 

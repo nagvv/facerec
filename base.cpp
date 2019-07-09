@@ -16,7 +16,7 @@
 
 Base::Base() : netManager( this )
 {
-	connect( &netManager, SIGNAL( finished( QNetworkReply * ) ), this, SLOT( onFinish( QNetworkReply * ) ) );
+	connect( &netManager, &QNetworkAccessManager::finished, this, &Base::onFinish );
 }
 
 bool Base::addFile( QString filepath )
@@ -41,8 +41,9 @@ bool Base::detectImage( QString filepath, std::function<void( qint64, qint64 )> 
 	if ( !files[filepath]->fileObj.open( QFile::ReadOnly ) )
 		return false;
 
+	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/detect?demographics=true&attributes=true&landmarks=true" );
 	QNetworkRequest req( url );
-	req.setRawHeader( "Authorization", jwtToken );
+	req.setRawHeader( "Authorization", QString( "Bearer %1" ).arg( jwtToken ).toUtf8() );
 	req.setRawHeader( "accept", "application/json" );
 	req.setRawHeader( "Content-Type", "image/jpeg" );
 
@@ -74,8 +75,67 @@ bool Base::detectImage( QString filepath, std::function<void( qint64, qint64 )> 
 	return true;
 }
 
+void Base::createDemoUser( const QString &email, const QString &password )
+{
+	QJsonObject request;
+	request.insert( "billing_type", "demo" );
+	request.insert( "email", email );
+	request.insert( "password", password );
+
+	QJsonObject someData;
+	QJsonArray someDataArr{ "to", "save" };
+	someData.insert( "some_data", someDataArr );
+	request.insert( "data", someData );
+
+	QJsonDocument json( request );
+
+	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/users" );
+	QNetworkRequest req( url );
+
+	req.setRawHeader( "accept", "application/json" );
+	req.setRawHeader( "Content-Type", "application/json" );
+
+	netManager.post( req, json.toJson() );
+}
+
+void Base::getToken( const QString &email, const QString &password )
+{
+	QJsonObject request;
+	request.insert( "email", email );
+	request.insert( "password", password );
+
+	QJsonDocument json( request );
+
+	QUrl url( "https://backend.facecloud.tevian.ru/api/v1/login" );
+	QNetworkRequest req( url );
+
+	req.setRawHeader( "accept", "application/json" );
+	req.setRawHeader( "Content-Type", "application/json" );
+
+	netManager.post( req, json.toJson() );
+}
+
+void Base::setToken( const QString &token )
+{
+	jwtToken = token;
+}
+
+bool Base::isAuthorized()
+{
+	return !jwtToken.isEmpty();
+}
+
 void Base::onFinish( QNetworkReply *rep )
 {
+	if ( rep->url().path() == "/api/v1/login" )
+		return onGetTokenFinish( rep );
+
+	if ( rep->url().path() == "/api/v1/users" )
+		return onCreateUserFinish( rep );
+
+	if ( rep->url().path() != "/api/v1/detect" )
+		return; // TODO add loggging
+
 	auto *imgObj = dynamic_cast<ImgObj *>(rep->request().originatingObject());
 
 	delete imgObj->buffer;
@@ -122,3 +182,25 @@ void Base::onFinish( QNetworkReply *rep )
 
 	rep->deleteLater();
 }
+
+void Base::onGetTokenFinish( QNetworkReply *rep )
+{
+	QString token;
+	if ( rep->error() == QNetworkReply::NoError )
+	{
+		QJsonDocument json = QJsonDocument::fromJson( rep->readAll() );
+		token = json["data"]["access_token"].toString();
+	}
+
+	emit getTokenFinished( token );
+	rep->deleteLater();
+}
+
+void Base::onCreateUserFinish( QNetworkReply *rep )
+{
+	bool success = ( rep->error() == QNetworkReply::NoError );
+	emit createUserFinished( success );
+	rep->deleteLater();
+}
+
+

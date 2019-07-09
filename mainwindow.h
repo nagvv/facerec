@@ -56,6 +56,8 @@ private slots:
 
 	void on_listWidget_currentRowChanged( int currentRow );
 
+	void on_loginBtn_clicked();
+
 private:
 	Ui::MainWindow *ui;
 };
